@@ -1,7 +1,7 @@
 package main
 
-import "url-shortner-service/model"
+import "url-shortner-service/entity"
 
 func main() {
-	model.Setup()
+	entity.Setup()
 }
