@@ -80,3 +80,9 @@ func (r UrlRepositoryImpl) FindByCode(code string) (*entity.Url, error) {
 	}
 	return &url, nil
 }
+
+func (r UrlRepositoryImpl) IncrementClicks(id uint64) error {
+	// execute increment in a single statement to avoid concurrency issues as multiple users may visit the url at the same time
+	tx := r.db.Exec("UPDATE urls SET clicks = clicks + 1 WHERE id = ?", id)
+	return tx.Error
+}
