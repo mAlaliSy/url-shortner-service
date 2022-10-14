@@ -1,7 +1,9 @@
 package routes
 
 import (
+	"errors"
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 	"strconv"
 	"strings"
 	"url-shortner-service/entity"
@@ -31,6 +33,9 @@ func Get(ctx *fiber.Ctx) error {
 	}
 	url, err := r.Get(id)
 	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ctx.Status(fiber.StatusNotFound).SendString("Not Found!")
+		}
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Something went wrong!",
 		})

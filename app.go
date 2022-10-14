@@ -7,6 +7,10 @@ import (
 	"url-shortner-service/routes"
 )
 
+func home(ctx *fiber.Ctx) error {
+	return ctx.Status(fiber.StatusOK).SendString("Welcome to Mohammad short url service. Note: I am too lazy to create a nice home page! \nFind my personal website at m.alali.dev")
+}
+
 func setupRoutes(app *fiber.App) {
 	// API Routes
 	app.Get("/api/url", routes.GetAll)
@@ -14,6 +18,12 @@ func setupRoutes(app *fiber.App) {
 	app.Post("/api/url/", routes.Create)
 	// There shouldn't be an update API!
 	app.Delete("/api/url/:id", routes.Delete)
+
+	// Home Route
+	app.Get("/", home)
+
+	// Redirect Route
+	app.Get("/:code", routes.Redirect)
 }
 
 func main() {
