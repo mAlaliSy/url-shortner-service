@@ -41,7 +41,7 @@ func GetUrlRepositoryInstance() *UrlRepositoryImpl {
 
 func (r UrlRepositoryImpl) Get(id uint64) (*entity.Url, error) {
 	var url entity.Url
-	tx := r.db.Where("id = ?", id).First(url)
+	tx := r.db.Where("id = ?", id).First(&url)
 	if tx.Error != nil {
 		return &entity.Url{}, tx.Error
 	}

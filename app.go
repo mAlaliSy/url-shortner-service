@@ -10,7 +10,10 @@ import (
 func setupRoutes(app *fiber.App) {
 	// API Routes
 	app.Get("/api/url", routes.GetAll)
-
+	app.Get("/api/url/:id", routes.Get)
+	app.Post("/api/url/", routes.Create)
+	// There shouldn't be an update API!
+	app.Delete("/api/url/:id", routes.Delete)
 }
 
 func main() {
