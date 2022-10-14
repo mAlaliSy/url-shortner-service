@@ -29,6 +29,8 @@ func setupRoutes(app *fiber.App) {
 func main() {
 	entity.Setup()
 
+	routes.SetupIncrementWorkers()
+
 	app := fiber.New()
 	app.Use(cors.New())
 
