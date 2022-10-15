@@ -25,22 +25,22 @@ type UrlRepositoryImpl struct {
 	db *gorm.DB
 }
 
-var singleton *UrlRepositoryImpl
-var lock = sync.RWMutex{}
+var singletonUrlRepo *UrlRepositoryImpl
+var urlRepoLock = sync.RWMutex{}
 
 func GetUrlRepositoryInstance() (*UrlRepositoryImpl, error) {
-	if singleton == nil {
-		lock.Lock()
-		defer lock.Unlock()
-		if singleton == nil {
+	if singletonUrlRepo == nil {
+		urlRepoLock.Lock()
+		defer urlRepoLock.Unlock()
+		if singletonUrlRepo == nil {
 			db, err := conf.GetDb()
 			if err != nil {
 				return nil, err
 			}
-			singleton = &UrlRepositoryImpl{db: db}
+			singletonUrlRepo = &UrlRepositoryImpl{db: db}
 		}
 	}
-	return singleton, nil
+	return singletonUrlRepo, nil
 }
 
 func (r UrlRepositoryImpl) Get(id uint64) (*entity.Url, error) {

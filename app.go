@@ -12,6 +12,10 @@ func home(ctx *fiber.Ctx) error {
 }
 
 func setupRoutes(app *fiber.App) {
+
+	// Auth Routes
+	app.Post("/auth/login", routes.Login)
+
 	// API Routes
 	app.Get("/api/url", routes.GetAll)
 	app.Get("/api/url/:id", routes.Get)
