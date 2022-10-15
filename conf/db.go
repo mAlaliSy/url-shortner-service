@@ -9,22 +9,16 @@ import (
 var db *gorm.DB
 var mutex = sync.RWMutex{}
 
-func initDb() {
-	var err error
-	dsn := "host=localhost port=5432 user=test password=test dbname=url_shortner sslmode=disable"
-	db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		panic(err)
-	}
-}
-
-func GetDb() *gorm.DB { // singleton
+func GetDb() (*gorm.DB, error) { // singleton
 	if db == nil {
 		mutex.Lock()
+		defer mutex.Unlock()
 		if db == nil {
-			initDb()
+			var err error
+			dsn := "host=localhost port=5432 user=test password=test dbname=url_shortner sslmode=disable"
+			db, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
+			return db, err
 		}
-		mutex.Unlock()
 	}
-	return db
+	return db, nil
 }

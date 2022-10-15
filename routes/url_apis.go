@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"log"
 	"strconv"
 	"strings"
 	"url-shortner-service/entity"
@@ -11,12 +12,25 @@ import (
 	"url-shortner-service/utils"
 )
 
-var r = repository.GetUrlRepositoryInstance()
+func getRepositoryOrSendErr(ctx *fiber.Ctx) (*repository.UrlRepositoryImpl, error) {
+	var r, err = repository.GetUrlRepositoryInstance()
+	if err != nil {
+		log.Printf("Couldn't get URL repository, error: %s", err.Error())
+		_ = ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
+			"message": "Something went wrong!",
+		})
+	}
+	return r, err
+}
 
 func GetAll(ctx *fiber.Ctx) error {
+	var r, err = getRepositoryOrSendErr(ctx)
+	if err != nil {
+		return err
+	}
+
 	all, err := r.GetAll()
 	if err != nil {
-		//log.Print("ERROR::", err.Error())
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Something went wrong",
 		})
@@ -25,6 +39,11 @@ func GetAll(ctx *fiber.Ctx) error {
 }
 
 func Get(ctx *fiber.Ctx) error {
+	var r, err = getRepositoryOrSendErr(ctx)
+	if err != nil {
+		return err
+	}
+
 	id, err := strconv.ParseUint(ctx.Params("id"), 10, 64)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -44,8 +63,13 @@ func Get(ctx *fiber.Ctx) error {
 }
 
 func Create(ctx *fiber.Ctx) error {
+	var r, err = getRepositoryOrSendErr(ctx)
+	if err != nil {
+		return err
+	}
+
 	var url entity.Url
-	err := ctx.BodyParser(&url)
+	err = ctx.BodyParser(&url)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Invalid request!",
@@ -76,6 +100,11 @@ regenerate:
 }
 
 func Delete(ctx *fiber.Ctx) error {
+	var r, err = getRepositoryOrSendErr(ctx)
+	if err != nil {
+		return err
+	}
+
 	id, err := strconv.ParseUint(ctx.Params("id"), 10, 64)
 	if err != nil {
 		return ctx.Status(fiber.StatusBadRequest).JSON(fiber.Map{

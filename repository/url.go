@@ -28,15 +28,19 @@ type UrlRepositoryImpl struct {
 var singleton *UrlRepositoryImpl
 var lock = sync.RWMutex{}
 
-func GetUrlRepositoryInstance() *UrlRepositoryImpl {
+func GetUrlRepositoryInstance() (*UrlRepositoryImpl, error) {
 	if singleton == nil {
 		lock.Lock()
+		defer lock.Unlock()
 		if singleton == nil {
-			singleton = &UrlRepositoryImpl{db: conf.GetDb()}
+			db, err := conf.GetDb()
+			if err != nil {
+				return nil, err
+			}
+			singleton = &UrlRepositoryImpl{db: db}
 		}
-		lock.Unlock()
 	}
-	return singleton
+	return singleton, nil
 }
 
 func (r UrlRepositoryImpl) Get(id uint64) (*entity.Url, error) {

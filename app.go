@@ -27,8 +27,8 @@ func setupRoutes(app *fiber.App) {
 }
 
 func main() {
-	entity.Setup()
-
+	// initial setup
+	entity.MigrateDB()
 	routes.SetupIncrementWorkers()
 
 	app := fiber.New()
