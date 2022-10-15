@@ -12,7 +12,7 @@ import (
 	"url-shortner-service/utils"
 )
 
-func getRepositoryOrSendErr(ctx *fiber.Ctx) (*repository.UrlRepositoryImpl, error) {
+func getRepositoryOrSendErr(ctx *fiber.Ctx) (*repository.UrlRepository, error) {
 	var r, err = repository.GetUrlRepositoryInstance()
 	if err != nil {
 		log.Printf("Couldn't get URL repository, error: %s", err.Error())
