@@ -4,6 +4,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"url-shortner-service/entity"
+	"url-shortner-service/middleware"
 	"url-shortner-service/routes"
 )
 
@@ -17,6 +18,13 @@ func setupRoutes(app *fiber.App) {
 	app.Post("/auth/login", routes.Login)
 	app.Post("/auth/register", routes.Register)
 
+	// Home Route
+	app.Get("/", home)
+
+	// Redirect Route
+	app.Get("/:code", routes.Redirect)
+
+	app.Use(middleware.AuthRequired())
 	// API Routes
 	app.Get("/api/url", routes.GetAll)
 	app.Get("/api/url/:id", routes.Get)
@@ -24,11 +32,6 @@ func setupRoutes(app *fiber.App) {
 	// There shouldn't be an update API!
 	app.Delete("/api/url/:id", routes.Delete)
 
-	// Home Route
-	app.Get("/", home)
-
-	// Redirect Route
-	app.Get("/:code", routes.Redirect)
 }
 
 func main() {
