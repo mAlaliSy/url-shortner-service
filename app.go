@@ -15,6 +15,7 @@ func setupRoutes(app *fiber.App) {
 
 	// Auth Routes
 	app.Post("/auth/login", routes.Login)
+	app.Post("/auth/register", routes.Register)
 
 	// API Routes
 	app.Get("/api/url", routes.GetAll)

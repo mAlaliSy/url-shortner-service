@@ -9,6 +9,8 @@ import (
 
 type UserRepository interface {
 	FindByUsername(username string) (*entity.User, error)
+
+	Create(user *entity.User) error
 }
 
 type UserRepositoryImpl struct {
@@ -37,4 +39,9 @@ func (r *UserRepositoryImpl) FindByUsername(username string) (*entity.User, erro
 	var user entity.User
 	tx := r.db.Where("username = ?", username).First(&user)
 	return &user, tx.Error
+}
+
+func (r *UserRepositoryImpl) Create(user *entity.User) error {
+	tx := r.db.Create(user)
+	return tx.Error
 }
