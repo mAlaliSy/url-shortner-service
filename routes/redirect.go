@@ -2,11 +2,12 @@ package routes
 
 import (
 	"errors"
-	"fmt"
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
+	"log"
 	"strconv"
 	"strings"
+	"url-shortner-service/repository"
 	"url-shortner-service/utils"
 )
 
@@ -21,9 +22,13 @@ var incrementClicksChn = make(chan uint64, maxQueueInt)
 
 func startIncrementClicksWorker(incrementChan <-chan uint64) {
 	for id := range incrementChan {
-		err := r.IncrementClicks(id)
+		r, err := repository.GetUrlRepositoryInstance()
 		if err != nil {
-			fmt.Println("Error updating clicks" + err.Error())
+			log.Printf("Couldn't get url repository to update clicks!, error: %s" + err.Error())
+		}
+		err = r.IncrementClicks(id)
+		if err != nil {
+			log.Printf("Error updating clicks" + err.Error())
 		}
 	}
 }
@@ -44,6 +49,11 @@ func SetupIncrementWorkers() {
 func Redirect(ctx *fiber.Ctx) error {
 
 	code := ctx.Params("code")
+
+	r, err := getRepositoryOrSendErr(ctx)
+	if err != nil {
+		return err
+	}
 
 	url, err := r.FindByCode(code)
 
