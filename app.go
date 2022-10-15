@@ -6,6 +6,7 @@ import (
 	"url-shortner-service/entity"
 	"url-shortner-service/middleware"
 	"url-shortner-service/routes"
+	"url-shortner-service/utils"
 )
 
 func home(ctx *fiber.Ctx) error {
@@ -50,6 +51,6 @@ func main() {
 		return c.SendStatus(404) // => 404 "Not Found"
 	})
 
-	app.Listen(":3000")
+	app.Listen(":" + utils.GetEnvOrDefault("PORT", "3000"))
 
 }
