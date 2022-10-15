@@ -29,7 +29,7 @@ func GetAll(ctx *fiber.Ctx) error {
 		return err
 	}
 
-	all, err := r.GetAll()
+	all, err := r.GetAllByUser(utils.GetCurrentUserId(ctx))
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Something went wrong",
@@ -50,7 +50,7 @@ func Get(ctx *fiber.Ctx) error {
 			"message": "Invalid id",
 		})
 	}
-	url, err := r.Get(id)
+	url, err := r.Get(id, utils.GetCurrentUserId(ctx))
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ctx.Status(fiber.StatusNotFound).SendString("Not Found!")
@@ -75,12 +75,13 @@ func Create(ctx *fiber.Ctx) error {
 			"message": "Invalid request!",
 		})
 	}
+	url.UserId = utils.GetCurrentUserId(ctx)
+	url.Clicks = 0
 	generate := url.Code == ""
 regenerate:
 	if generate {
 		url.Code = utils.RandomAlphanumeric(6)
 	}
-	url.Clicks = 0
 	err = r.Create(&url)
 	if err != nil {
 		if generate {
@@ -111,7 +112,7 @@ func Delete(ctx *fiber.Ctx) error {
 			"message": "Invalid id!",
 		})
 	}
-	err = r.Delete(id)
+	err = r.Delete(id, utils.GetCurrentUserId(ctx))
 	if err != nil {
 		return ctx.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Something went wrong!",

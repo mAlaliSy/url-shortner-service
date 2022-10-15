@@ -16,7 +16,7 @@ type UrlRepository interface {
 
 	Delete(id uint64) error
 
-	GetAll() (*[]entity.Url, error)
+	GetAllByUser(userId uint64) (*[]entity.Url, error)
 
 	FindByCode(code string) (*entity.Url, error)
 }
@@ -43,18 +43,18 @@ func GetUrlRepositoryInstance() (*UrlRepositoryImpl, error) {
 	return singletonUrlRepo, nil
 }
 
-func (r UrlRepositoryImpl) Get(id uint64) (*entity.Url, error) {
+func (r UrlRepositoryImpl) Get(id uint64, userId uint64) (*entity.Url, error) {
 	var url entity.Url
-	tx := r.db.Where("id = ?", id).First(&url)
+	tx := r.db.Where("id = ? and user_id = ?", id, userId).First(&url)
 	if tx.Error != nil {
 		return &entity.Url{}, tx.Error
 	}
 	return &url, nil
 }
 
-func (r UrlRepositoryImpl) GetAll() (*[]entity.Url, error) {
+func (r UrlRepositoryImpl) GetAllByUser(userId uint64) (*[]entity.Url, error) {
 	var urls []entity.Url
-	tx := r.db.Find(&urls)
+	tx := r.db.Where("user_id = ?", userId).Find(&urls)
 	if tx.Error != nil {
 		return &[]entity.Url{}, tx.Error
 	}
@@ -71,8 +71,8 @@ func (r UrlRepositoryImpl) Update(url *entity.Url) error {
 	return tx.Error
 }
 
-func (r UrlRepositoryImpl) Delete(id uint64) error {
-	tx := r.db.Unscoped().Delete(&entity.Url{}, id)
+func (r UrlRepositoryImpl) Delete(id uint64, userId uint64) error {
+	tx := r.db.Unscoped().Where("user_id = ?", userId).Delete(&entity.Url{}, id)
 	return tx.Error
 }
 

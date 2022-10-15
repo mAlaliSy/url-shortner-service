@@ -58,7 +58,7 @@ func Login(ctx *fiber.Ctx) error {
 	claims := token.Claims.(jwt.MapClaims)
 	claims["sub"] = user.Username
 	claims["id"] = user.ID
-	claims["exp"] = time.Now().Add(15 * time.Minute)
+	claims["exp"] = time.Now().Add(15 * time.Minute).Unix()
 	stoken, err := token.SignedString([]byte(jwtSecret))
 	if err != nil {
 		log.Printf("Couldn't sign jwt token, error: %s", err.Error())
